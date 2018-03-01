@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<ui:composition
+	template="/WEB-INF/templates/Layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<f:viewAction action="#{gestaoEmpresasBean.consultar}" />
+		</f:metadata>
+
+		<h1>Cadastro de Empresas</h1>
+
+		<h:form id="frm">
+
+			<p:messages id="msgs" />
+			<!-- 		<p:growl id="msgs" /> -->
+
+			<p:toolbar>
+				<f:facet name="left">
+					<p:commandButton
+						value="Novo"
+						process="@this"
+						icon="ui-icon-document"
+						update="empresa-dialog"
+						actionListener="#{gestaoEmpresasBean.preparar}"
+						oncomplete="PF('novaEmpresaDialog').show()">
+						<p:resetInput target="empresa-dialog" />
+					</p:commandButton>
+
+					<span class="ui-separator"> <span
+						class="ui-icon ui-icon-grip-dotted-vertical" />
+					</span>
+
+					<p:commandButton
+						icon="ui-icon-pencil"
+						title="Editar" />
+					<p:commandButton
+						icon="ui-icon-trash"
+						title="Excluir" />
+					<p:commandButton
+						icon="ui-icon-arrowreturnthick-1-s"
+						title="Exportar para XLS" />
+
+				</f:facet>
+			</p:toolbar>
+
+			<p:dataTable
+				id="empresas-table"
+				var="empresa"
+				rows="10"
+				paginator="true"
+				paginatorPosition="bottom"
+				value="#{gestaoEmpresasBean.todasEmpresas}"
+				emptyMessage="Nenhuma empresa cadastrada."
+				style="margin-top: 10px;">
+				<p:column
+					headerText="Razão Social"
+					sortBy="#{empresa.razaoSocial}">
+					<h:outputText value="#{empresa.razaoSocial}" />
+				</p:column>
+				<p:column
+					headerText="Nome Fantasia"
+					width="250">
+					<h:outputText value="#{empresa.nomeFantasia}" />
+				</p:column>
+				<p:column
+					headerText="CNPJ"
+					width="160">
+					<h:outputText value="#{empresa.cnpj}" />
+				</p:column>
+			</p:dataTable>
+
+			<!-- Dialog Nova Empresa-->
+			<p:dialog
+				header="Nova Empresa"
+				widgetVar="novaEmpresaDialog"
+				id="empresa-dialog"
+				modal="true"
+				resizable="false"
+				closeOnEscape="true">
+
+				<!-- Mensagem dialog -->
+				<p:messages id="msg-dialog" />
+
+				<!-- Informo que o botao pradão e o salvar dentro do scopo do dialog  -->
+				<p:defaultCommand
+					target="salvar-button"
+					scope="empresa-dialog" />
+
+				<p:panelGrid
+					columns="2"
+					id="painel-dialog">
+					<p:outputLabel
+						value="Nome Fantásia"
+						for="nome-fantasia" />
+					<p:inputText
+						id="nome-fantasia"
+						size="60"
+						maxlength="80"
+						value="#{gestaoEmpresasBean.empresaEdicao.nomeFantasia}" />
+
+					<p:outputLabel
+						value="Razão Social"
+						for="razao-social" />
+					<p:inputText
+						id="razao-social"
+						size="60"
+						maxlength="120"
+						value="#{gestaoEmpresasBean.empresaEdicao.razaoSocial}" />
+
+					<p:outputLabel
+						value="CNPJ"
+						for="cnpj" />
+					<p:inputMask
+						id="cnpj"
+						size="18"
+						mask="99.999.999/9999-99"
+						maxlength="18"
+						value="#{gestaoEmpresasBean.empresaEdicao.cnpj}" />
+
+					<p:outputLabel
+						value="Data de Fundação"
+						for="data-fundacao" />
+					<p:calendar
+						id="data-fundacao"
+						size="10"
+						mask="99/99/9999"
+						pattern="dd/MM/yyyy"
+						value="#{gestaoEmpresasBean.empresaEdicao.dataFundacao}" />
+
+					<p:outputLabel
+						value="Tipo"
+						for="tipo" />
+					<p:selectOneMenu
+						id="tipo"
+						value="#{gestaoEmpresasBean.empresaEdicao.tipo}">
+						<f:selectItem itemLabel="Selecione" />
+						<f:selectItems
+							value="#{gestaoEmpresasBean.tipoEmpresas}"
+							var="tipo"
+							itemLabel="#{tipo.descricao}"
+							itemValue="#{tipo}" />
+					</p:selectOneMenu>
+
+					<p:outputLabel />
+					<p:commandButton
+						value="Salvar"
+						action="#{gestaoEmpresasBean.salvar}"
+						id="salvar-button"
+						process="empresa-dialog"
+						update="msg-dialog painel-dialog"
+						oncomplete="if(!args.validationFailed) PF('novaEmpresaDialog').hide()" />
+
+				</p:panelGrid>
+			</p:dialog>
+
+		</h:form>
+	</ui:define>
+</ui:composition>
