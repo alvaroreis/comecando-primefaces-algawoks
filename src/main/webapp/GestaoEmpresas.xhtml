@@ -19,7 +19,7 @@
 			<p:messages id="msgs" />
 			<!-- 		<p:growl id="msgs" /> -->
 
-			<p:toolbar>
+			<p:toolbar id="toolbar">
 				<f:facet name="left">
 					<p:commandButton
 						value="Novo"
@@ -37,13 +37,41 @@
 
 					<p:commandButton
 						icon="ui-icon-pencil"
-						title="Editar" />
+						title="Editar"
+						process="@this"
+						update="empresa-dialog"
+						oncomplete="PF('novaEmpresaDialog').show()"
+						disabled="#{gestaoEmpresasBean.empresaSelecionada == null}">
+						<p:resetInput target="empresa-dialog" />
+
+						<f:setPropertyActionListener
+							value="#{gestaoEmpresasBean.empresaSelecionada}"
+							target="#{gestaoEmpresasBean.empresaEdicao}" />
+					</p:commandButton>
+
 					<p:commandButton
 						icon="ui-icon-trash"
-						title="Excluir" />
+						title="Excluir"
+						process="@this"
+						action="#{gestaoEmpresasBean.excluir}"
+						disabled="#{gestaoEmpresasBean.empresaSelecionada == null}">
+						<p:confirm
+							header="Confirmação de exclusão"
+							icon="ui-icon-alert"
+							message="Tem certeza que você deseja excluir a empresa?" />
+					</p:commandButton>
+
 					<p:commandButton
 						icon="ui-icon-arrowreturnthick-1-s"
-						title="Exportar para XLS" />
+						title="Exportar para XLS"
+						ajax="false"
+						immediate="true" >
+						<p:dataExporter
+							type="xls"
+							target="empresas-table"
+							fileName="empresas"  />
+							
+					</p:commandButton>
 
 				</f:facet>
 			</p:toolbar>
@@ -56,7 +84,28 @@
 				paginatorPosition="bottom"
 				value="#{gestaoEmpresasBean.todasEmpresas}"
 				emptyMessage="Nenhuma empresa cadastrada."
-				style="margin-top: 10px;">
+				style="margin-top: 10px;"
+				selection="#{gestaoEmpresasBean.empresaSelecionada}"
+				selectionMode="single"
+				rowKey="#{empresa.id}">
+
+				<p:ajax
+					event="rowSelect"
+					update=":frm:toolbar" />
+
+				<p:ajax
+					event="rowUnselect"
+					update=":frm:toolbar" />
+				<!--
+					var="empresa"
+					rows="10"
+					paginator="true" -> indica que eu quero ter paginação na tabela
+					paginatorPosition="bottom" -> indica que eu quero ter a tabela no rodape
+					selection="#{gestaoEmpresasBean.empresaSelecionada}" -> ele atribuira a linha que eu selecionar na variavel empresaSelecionada
+					selectionMode="single" -> especifico que quero a marcação em apenas uma linha e não em mutiplas
+					rowKey="empresa.id" -> diz que a chabe da linha e o id da empresa selecionada 
+				 -->
+
 				<p:column
 					headerText="Razão Social"
 					sortBy="#{empresa.razaoSocial}">

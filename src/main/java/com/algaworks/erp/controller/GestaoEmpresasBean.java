@@ -30,9 +30,10 @@ public class GestaoEmpresasBean implements Serializable {
 	private FacesMessages messages;
 
 	private Empresa empresaEdicao = new Empresa();
-	
+	private Empresa empresaSelecionada;
 	private List<Empresa> todasEmpresas;
-	
+
+	/* GETTERS AND SETTER */
 	public List<Empresa> getTodasEmpresas() {
 		return todasEmpresas;
 	}
@@ -47,7 +48,15 @@ public class GestaoEmpresasBean implements Serializable {
 	public void setEmpresaEdicao(Empresa empresaEdicao) {
 		this.empresaEdicao = empresaEdicao;
 	}
+	
+	public Empresa getEmpresaSelecionada() {
+		return empresaSelecionada;
+	}
+	public void setEmpresaSelecionada(Empresa empresaSelecionada) {
+		this.empresaSelecionada = empresaSelecionada;
+	}	
 
+	/* MÉTODOS */
 	public void preparar(){
 		empresaEdicao = new Empresa();
 	}
@@ -55,13 +64,27 @@ public class GestaoEmpresasBean implements Serializable {
 		todasEmpresas = empresas.todas();
 	}
 
+	public void excluir(){
+		cadastroEmpresa.excluir(empresaSelecionada);
+		empresaSelecionada = null;
+		consultar();
+		
+		messages.info("Empresa excluída com sucesso!");
+		
+		/*se a instacias for excluida com sucesso ele dá um update nos ids informados abaixo
+		 * O correto era colocar na tag no html o atributo 
+		 * (update="empresas-table msgs toolbar")*/
+		RequestContext.getCurrentInstance().update(
+				Arrays.asList("frm:msgs", "frm:empresas-table", "frm:toolbar"));
+	}
+	
 	public void salvar(){
 		cadastroEmpresa.salvar(empresaEdicao);
 		consultar();
 		
 		messages.info("Empresa salva com sucesso!");
 		
-		/*pesga as instacias com esse id e dá um update caso seja bem sucedida*/
+		/*pega as instacias com esse id e dá um update caso seja bem sucedida*/
 		RequestContext.getCurrentInstance().update(
 				Arrays.asList("frm:msgs", "frm:empresas-table"));
 	}
